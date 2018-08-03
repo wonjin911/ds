@@ -1,5 +1,6 @@
 var API_ENDPOINT = 'https://inputtools.google.com/request?ime=handwriting&app=autodraw&dbg=1&cs=1&oe=UTF-8';
 var SVG_ENDPOINT = 'https://storage.googleapis.com/artlab-public.appspot.com/stencils/selman/';
+var TRANSLATE_ENDPOINT = 'https://glosbe.com/gapi/translate?from=pol&dest=eng&format=json&phrase=witaj&pretty=true';
 var canvas, ctx, pressed = false, pressedAt = 0, drawingInterval = null, intervalLastPosition = [-1,-1], shapes = [], currentShape = null,
     prevX = 0,
     currX = 0,
@@ -179,7 +180,15 @@ function displaySuggestions(suggestions) {
 
     //suggestions.sort(function(b,a) {return (a.confidence > b.confidence) ? 1 : ((b.confidence > a.confidence) ? -1 : 0);} );
 
+    var $table = jQuery('<table />');
+
+    var $row = jQuery('<tr />')
     for (var i = 0; i < suggestions.length; i++) {
+
+        if (i%5 == 0) {
+            $row = jQuery('<tr />')
+        }
+
         var suggestion = suggestions[i];
         
         var $img = jQuery('<img />')
@@ -193,13 +202,16 @@ function displaySuggestions(suggestions) {
             });
 
         var $detail = jQuery('<p />').text(suggestion.name);
-
-        var $imgWrapper = jQuery('<div />').attr('style', 'width:80px;height:80px;');
+        var $imgWrapper = jQuery('<td />').attr('style', 'width:80px;height:100px;');
         $imgWrapper.append($img);
-        
-        $suggestions.append($imgWrapper);
-        $suggestions.append($detail);
+        $imgWrapper.append($detail);
+        $row.append($imgWrapper);
+
+        if (i%5 == 0) {
+            $table.append($row);
+        }
     }
+    $suggestions.append($table);
 }
 
 function pickSuggestion(src) {
